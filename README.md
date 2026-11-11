@@ -1,41 +1,47 @@
 # Claude Animation Base
 
-This is a small starter kit with code, instructions and assets for animating a character in [p5.js](https://p5js.org) and [p5.brush](https://github.com/acamposuribe/p5.brush) with Claude Opus 5.5. It's based on the code from the music video [I'm Upping My P(doom)](https://github.com/JohnHeibel/PDoomVideo) and an analysis of what the model did and didn't do well. I highly recommend playing around with your prompting: make it give you the storyboard before coding, give it very broad instructions, try being very specific, ask for subagents, and try a bunch of other fun ways of testing the model's capabilities. In my testing, it can do a lot with very little, but it's also quite accurate when you give it more requirements. Also try asking the model to swap out the character or make new emotions or costumes, give it your own reference images, and try many other fun things like that. I've found that the reasoning level corresponds to how "extravagant" and detail-oriented the model makes the scene. All test videos were generated with Opus 5.5 on xhigh reasoning in Claude Code.
+Это небольшой стартовый набор: код, инструкции и материалы, чтобы анимировать персонажа в [p5.js](https://p5js.org) и [p5.brush](https://github.com/acamposuribe/p5.brush) с помощью Claude Opus 5.5. Он основан на коде клипа [I'm Upping My P(doom)](https://github.com/JohnHeibel/PDoomVideo) и на разборе того, что модель сделала хорошо, а что нет.
 
-![Clawd's emotions, animated](docs/emotions.webp)
+Очень советую экспериментировать с промтами: просить раскадровку до написания кода, давать совсем общие указания, пробовать быть очень конкретным, просить субагентов и придумывать другие весёлые способы проверить, на что способна модель. По моим тестам, она может многое сделать из очень малого, но при этом довольно точно выполняет и подробные требования.
 
-## Make a video
+Попробуй также попросить модель заменить персонажа, придумать новые эмоции или костюмы, дать ей свои референсы и всё в таком духе. Я заметил, что уровень рассуждений (effort) прямо влияет на то, насколько «роскошной» и детальной модель делает сцену. Все тестовые ролики сделаны на Opus 5.5 с effort xhigh в Claude Code.
 
-Clone it, open it in Claude Code (or any coding agent) and ask for what you want:
+![Эмоции Клода в анимации](docs/emotions.webp)
 
-> Read ANIMATION_GUIDE.md, then make a 15-second video of Clawd trying to catch a butterfly.
+## Как сделать ролик
 
-The model storyboards first, builds shot by shot, renders contact sheets to check its own work, and writes `out/video.mp4`. [ANIMATION_GUIDE.md](ANIMATION_GUIDE.md) holds the rules it follows: handmade, alive, one piece, no text, transitions always, something happens in every scene, and a solid medium of brush strokes, flat 2D and boiling linework. It also covers timing for the viewer and the core principles of character animation.
+Склонируй репозиторий, открой его в Claude Code (или любом другом ИИ-агенте для кода) и попроси, что хочешь:
 
-## Run it yourself
+> Прочитай ANIMATION_GUIDE.md, потом сделай 15-секундный ролик, где Клод пытается поймать бабочку.
 
-You need Node.js, Google Chrome and ffmpeg.
+Модель сначала делает раскадровку, собирает ролик кадр за кадром, рендерит контактные листы (сетку кадров), чтобы проверить свою работу, и сохраняет результат в `out/video.mp4`.
 
-Without a dedicated GPU, p5.brush's watercolour fills make render times fairly slow, measured in seconds per frame. If you're running on integrated graphics, I recommend asking the model to avoid those fills and replace them with something else appropriate. (I love the look of the watercolours, though.)
+В [ANIMATION_GUIDE.md](ANIMATION_GUIDE.md) лежат правила, по которым она работает: «сделано вручную», живое, цельное, без текста, всегда с переходами, в каждой сцене что-то происходит, единая техника из мазков кисти, плоского 2D и «дрожащих» линий. Там же описано, как выстраивать тайминг для зрителя, и основные принципы анимации персонажей.
+
+## Как запустить самому
+
+Нужны Node.js, Google Chrome и ffmpeg.
+
+Без отдельной видеокарты акварельные заливки p5.brush рендерятся довольно медленно - по несколько секунд на кадр. Если у тебя встроенная графика, советую попросить модель не использовать эти заливки и заменить их чем-то подходящим. (Хотя мне очень нравится, как выглядит акварель.)
 
 ```bash
 npm install
 node render.mjs --clip --out=out/video.mp4
 ```
 
-That renders the 11-second demo in [src/scenes/demo.js](src/scenes/demo.js). Open [studio.html](studio.html) in Chrome to scrub through it. Add `?loop=emotions` or `?loop=views` to see the model sheets. If Chrome isn't in a standard location, pass `--chrome=<path>` or set `CHROME_PATH`.
+Это отрендерит 11-секундное демо из [src/scenes/demo.js](src/scenes/demo.js). Открой [studio.html](studio.html) в Chrome, чтобы прокручивать его по времени. Добавь к адресу `?loop=emotions` или `?loop=views`, чтобы посмотреть листы персонажа. Если Chrome установлен не в стандартное место, укажи `--chrome=<путь>` или задай переменную `CHROME_PATH`.
 
-On Linux, `render.mjs` starts Chrome with `--no-sandbox` (Ubuntu 23.10+ blocks Chrome's sandbox in headless use) and also finds a Chromium installed by Playwright. With no GPU at all, add `--soft-gl` to render WebGL in software: slow on watercolour fills, but it works. On a headless Linux machine with an NVIDIA GPU (a cloud or cluster node), add `--gpu-angle=gl-egl` (or `vulkan`); `node gpu_probe.mjs <chrome path>` shows which renderer each set of flags gets.
+На Linux `render.mjs` запускает Chrome с флагом `--no-sandbox` (Ubuntu 23.10+ блокирует песочницу Chrome в фоновом режиме), а также находит Chromium, установленный через Playwright. Если видеокарты нет совсем, добавь `--soft-gl`, чтобы WebGL рендерился программно: на акварельных заливках медленно, но работает. На Linux-сервере без экрана с видеокартой NVIDIA (облако или кластер) добавь `--gpu-angle=gl-egl` (или `vulkan`). Команда `node gpu_probe.mjs <путь к chrome>` покажет, какой рендерер получается с каждым набором флагов.
 
-## What's here
+## Что здесь лежит
 
-| path | what it is |
+| путь | что это |
 |---|---|
-| [ANIMATION_GUIDE.md](ANIMATION_GUIDE.md) | The rules, the workflow and the full API. Read it first. |
-| [src/clawd.js](src/clawd.js) | Clawd: views, emotions, eyes, mouths, hats, emotes, dances |
-| [src/core.js](src/core.js) | Painting, timing, motion helpers, camera, light, paper |
-| [src/timeline.js](src/timeline.js) | Shots, loops and the brush-wipe transition |
-| [src/config.js](src/config.js) | Length and tempo |
-| [src/scenes/](src/scenes/) | Your video goes here (the demo is an example) |
-| [render.mjs](render.mjs) | Headless renderer: contact sheets, frame strips, crops, stills, MP4 |
-| [docs/](docs/) | Model sheets: [emotions](docs/emotions.jpg) (also [animated](docs/emotions.webp)) and [views, motion and hats](docs/views.jpg) |
+| [ANIMATION_GUIDE.md](ANIMATION_GUIDE.md) | Правила, порядок работы и полное описание функций. Читать первым. |
+| [src/clawd.js](src/clawd.js) | Клод: ракурсы, эмоции, глаза, рты, шляпы, эмоции-значки, танцы |
+| [src/core.js](src/core.js) | Рисование, тайминг, помощники для движения, камера, свет, бумага |
+| [src/timeline.js](src/timeline.js) | Кадры, циклы и переход «мазком кисти» |
+| [src/config.js](src/config.js) | Длина и темп |
+| [src/scenes/](src/scenes/) | Сюда кладётся твой ролик (демо - для примера) |
+| [render.mjs](render.mjs) | Фоновый рендерер: контактные листы, полоски кадров, кропы, стоп-кадры, MP4 |
+| [docs/](docs/) | Листы персонажа: [эмоции](docs/emotions.jpg) (есть и [анимированная версия](docs/emotions.webp)) и [ракурсы, движения и шляпы](docs/views.jpg) |
